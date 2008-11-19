@@ -17,7 +17,7 @@
 
 =pod
 
----+ package TWiki::Plugins::InterwikiPlugin
+---+ package Foswiki::Plugins::InterwikiPlugin
 
 Recognises and processes special links to other sites defined
 using "inter-site syntax".
@@ -33,12 +33,12 @@ in a [[link]] or [[link][text]] expression.
 
 =cut
 
-package TWiki::Plugins::InterwikiPlugin;
+package Foswiki::Plugins::InterwikiPlugin;
 
 use strict;
 
-require TWiki::Func;    # The plugins API
-require TWiki::Plugins; # For the API version
+require Foswiki::Func;    # The plugins API
+require Foswiki::Plugins; # For the API version
 
 use vars qw(
             $VERSION
@@ -62,7 +62,7 @@ $RELEASE = '03 Aug 2008';
 
 BEGIN {
     # 'Use locale' for internationalisation of Perl sorting and searching - 
-    if( $TWiki::cfg{UseLocale} ) {
+    if( $Foswiki::cfg{UseLocale} ) {
         require locale;
         import locale ();
     }
@@ -75,32 +75,32 @@ sub initPlugin {
     $interWeb = $installWeb;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between InterwikiPlugin and Plugins.pm" );
+    if( $Foswiki::Plugins::VERSION < 1.026 ) {
+        Foswiki::Func::writeWarning( "Version mismatch between InterwikiPlugin and Plugins.pm" );
         return 0;
     }
 
     # Regexes for the Site:page format InterWiki reference
-    my $man = TWiki::Func::getRegularExpression('mixedAlphaNum');
-    my $ua = TWiki::Func::getRegularExpression('upperAlpha');
+    my $man = Foswiki::Func::getRegularExpression('mixedAlphaNum');
+    my $ua = Foswiki::Func::getRegularExpression('upperAlpha');
     $sitePattern    = "([$ua][$man]+)";
     $pagePattern    = "([${man}_\/][$man" . '\.\/\+\_\,\;\:\!\?\%\#\@\-]*?)';
 
     # Get plugin preferences from InterwikiPlugin topic
     $interLinkFormat =
-      TWiki::Func::getPreferencesValue( 'INTERWIKIPLUGIN_INTERLINKFORMAT' ) ||
+      Foswiki::Func::getPreferencesValue( 'INTERWIKIPLUGIN_INTERLINKFORMAT' ) ||
       '<a href="$url" title="$tooltip"><noautolink>$label</noautolink></a>';
 
     my $interTopic =
-      TWiki::Func::getPreferencesValue( 'INTERWIKIPLUGIN_RULESTOPIC' )
+      Foswiki::Func::getPreferencesValue( 'INTERWIKIPLUGIN_RULESTOPIC' )
           || 'InterWikis';
     ( $interWeb, $interTopic ) =
-      TWiki::Func::normalizeWebTopicName( $interWeb, $interTopic );
+      Foswiki::Func::normalizeWebTopicName( $interWeb, $interTopic );
     if( $interTopic =~ s/^(.*)\.// ) {
         $interWeb = $1;
     }
 
-    my $text = TWiki::Func::readTopicText( $interWeb, $interTopic, undef, 1 );
+    my $text = Foswiki::Func::readTopicText( $interWeb, $interTopic, undef, 1 );
 
     # '| alias | URL | ...' table and extract into 'alias', "URL" list
     $text =~ s/^\|\s*$sitePattern\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|.*$/_map($1,$2,$3)/mego;
